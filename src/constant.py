@@ -18,7 +18,7 @@ IMAGE_DIR = '../data/images'
 
 
 # In order to visualize masked-image(s), change "False" with "True"
-VISUALIZE = True
+VISUALIZE = False
 
 # Bacth size
 BACTH_SIZE = 4

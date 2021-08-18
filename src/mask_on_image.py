@@ -1,9 +1,10 @@
+#import libraries
 import os
 import cv2
 import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
-from constant import *
+from constant import * #constant values
 
 
 # Create a list which contains every file name in masks folder
@@ -24,14 +25,14 @@ for mask_name in tqdm.tqdm(mask_list):
     image_out_path = os.path.join(IMAGE_OUT_DIR, mask_name)
 
     # Read mask and corresponding original image
-    mask  = cv2.imread(mask_path, 0).astype(np.uint8)
-    image = cv2.imread(image_path).astype(np.uint8)
+    mask  = cv2.imread(mask_path, 0).astype(np.uint8) #2 dimension. Gray-scale
+    image = cv2.imread(image_path).astype(np.uint8)  # 3 dimension. RGB
 
     # Change the color of the pixels on the original image that corresponds
     # to the mask part and create new image
-    cpy_image  = image.copy()
-    image[mask==1, :] = (255, 0, 125)
-    opac_image = (image/2 + cpy_image/2).astype(np.uint8)
+    cpy_image  = image.copy()  # create new image.
+    image[mask==1, :] = (255, 0, 125)   # maskta piksel degerleri 1 olan yerleri al rengini degistir
+    opac_image = (image/2 + cpy_image/2).astype(np.uint8) # orijinal resim ile masklar isaretlenmis resmi birlestir(piksel olarak )
 
     # Write output image into IMAGE_OUT_DIR folder
     cv2.imwrite(image_out_path, opac_image)
