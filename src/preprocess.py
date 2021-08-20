@@ -163,7 +163,6 @@ def image_mask_check(image_path_list, mask_path_list):
 
     return True
 
-############################ TODO ################################
 def torchlike_data(data):
     """
     Change data structure according to Torch Tensor structure where the first
@@ -205,7 +204,7 @@ def one_hot_encoder(data, n_class):
         Each channel labels for a class.
     """
     if len(data.shape) != 2:
-        print("It should be same with the layer dimension, in this case it is 2")
+        print("It should be same with the layer dimension")
         return
     if len(np.unique(data)) != n_class:
         print("The number of unique values ​​in 'data' must be equal to the n_class")
@@ -219,13 +218,15 @@ def one_hot_encoder(data, n_class):
 
     #
     for lbl in range(n_class):
-        ...
 
-
+        encoded_label = encoded_labels[lbl] # lbl = 0 için (arkaplan) [1, 0] labeli olusturuluyor, 
+                                            # lbl = 1 için (freespace) [0, 1] labelini olusturuluyor.
+        numerical_class_inds = data[:,:] == lbl # lbl = 0 için data'nın 0'a eşit olduğu w,h ikililerini alıyorum diyelim ki (F).
+                                                # lbl = 1 için data'nın 1'e eşit olduğu w,h ikililerini alıyorum diyelim ki (O).
+        encoded_data[numerical_class_inds] = encoded_label # lbl = 0 için tüm F'in sahip olduğu tüm w,h ikililerini [1, 0]'a eşitliyorum.
+                                                            # lbl = 1 için tüm O'un sahip olduğu tüm w,h ikililerini [0, 1]'e eşitliyorum.
 
     return encoded_data
-############################ TODO END ################################
-
 
 if __name__ == '__main__':
 
