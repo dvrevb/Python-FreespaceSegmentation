@@ -26,8 +26,6 @@ from constant import *
 
 def tensorize_image(image_path_list, output_shape, cuda=False):
     """
-
-
     Parameters
     ----------
     image_path_list : list of strings
@@ -37,12 +35,10 @@ def tensorize_image(image_path_list, output_shape, cuda=False):
         (n1, n2): n1, n2 is width and height of the DNN model’s input.
     cuda : boolean, optional
         For multiprocessing,switch to True. The default is False.
-
     Returns
     -------
     torch_image : Torch tensor
         Batch tensor whose size is [batch_size, output_shape[0], output_shape[1], C].       For this case C = 3.
-
     """
     # Create empty list
     local_image_list = []
@@ -74,8 +70,6 @@ def tensorize_image(image_path_list, output_shape, cuda=False):
 
 def tensorize_mask(mask_path_list, output_shape, n_class, cuda=False):
     """
-
-
     Parameters
     ----------
     mask_path_list : list of strings
@@ -87,12 +81,10 @@ def tensorize_mask(mask_path_list, output_shape, n_class, cuda=False):
         Number of classes.
     cuda : boolean, optional
         For multiprocessing, switch to True. The default is False.
-
     Returns
     -------
     torch_mask : TYPE
         DESCRIPTION.
-
     """
 
     # Create empty list
@@ -123,12 +115,25 @@ def tensorize_mask(mask_path_list, output_shape, n_class, cuda=False):
 
     return torch_mask
 
+def decode_and_convert_image(data, n_class):
+    decoded_data_list = []
+    decoded_data = np.zeros((data.shape[2], data.shape[3]), dtype=np.int)
+
+    for tensor in data:
+        for i in range(len(tensor[0])):
+            for j in range(len(tensor[1])):
+                if (tensor[1][i,j] == 0):
+                    decoded_data[i, j] = 255
+                else: #(tensor[1][i,j] == 1):
+                    decoded_data[i, j] = 0
+        decoded_data_list.append(decoded_data)
+    
+    return decoded_data_list
 def image_mask_check(image_path_list, mask_path_list):
     """
     Since it is supervised learning, there must be an expected output for each
     input. This function assumes input and expected output images with the
     same name.
-
     Parameters
     ----------
     image_path_list : list of strings
@@ -137,12 +142,10 @@ def image_mask_check(image_path_list, mask_path_list):
     mask_path_list : list of strings
         [“data/masks/mask1.png”, .., “data/masks/maskn.png”] corresponds
         to n masks to be used as labels.
-
     Returns
     -------
     bool
         Returns true if there is expected output/label for each input.
-
     """
 
     # Check list lengths
@@ -152,8 +155,8 @@ def image_mask_check(image_path_list, mask_path_list):
 
     # Check each file names
     for image_path, mask_path in zip(image_path_list, mask_path_list):
-        image_name = image_path.split('/')[-1].split('.')[0]
-        mask_name  = mask_path.split('/')[-1].split('.')[0]
+        image_name = image_path.split('/')[-1].split('\\')[-1].split('.')[0]
+        mask_name  = mask_path.split('/')[-1].split('\\')[-1].split('.')[0]
         if image_name != mask_name:
             print("Image and mask name does not match {} - {}".format(image_name, mask_name)+"\nImages and masks folder should have same file names." )
             return False
@@ -165,49 +168,41 @@ def torchlike_data(data):
     """
     Change data structure according to Torch Tensor structure where the first
     dimension corresponds to the data depth.
-
-
     Parameters
     ----------
     data : Array of uint8
         Shape : HxWxC.
-
     Returns
     -------
-    torchlike_data_output : Array of float64
+    torchlike_data : Array of float64
         Shape : CxHxW.
-
     """
 
     # Obtain channel value of the input
     n_channels = data.shape[2]
 
     # Create and empty image whose dimension is similar to input
-    torchlike_data_output = np.empty((...))
+    torchlike_data = np.empty((n_channels, data.shape[0], data.shape[1]))
 
     # For each channel
-    ...
-
-    return torchlike_data_output
+    for ch in range(n_channels):
+        torchlike_data[ch] = data[:,:,ch]
+    return torchlike_data
 
 def one_hot_encoder(data, n_class):
     """
     Returns a matrix containing as many channels as the number of unique
     values ​​in the input Matrix, where each channel represents a unique class.
-
-
     Parameters
     ----------
     data : Array of uint8
         2D matrix.
     n_class : integer
         Number of class.
-
     Returns
     -------
     encoded_data : Array of int64
         Each channel labels for a class.
-
     """
     if len(data.shape) != 2:
         print("It should be same with the layer dimension, in this case it is 2")
@@ -232,12 +227,9 @@ def one_hot_encoder(data, n_class):
 ############################ TODO END ################################
 
 
-
-
-
 if __name__ == '__main__':
 
-    # Access images
+  # # Access images
     image_list = glob.glob(os.path.join(IMAGE_DIR, '*'))
     image_list.sort()
 
@@ -273,4 +265,4 @@ if __name__ == '__main__':
         print("Type is "+str(type(batch_mask_tensor)))
         print("The size should be ["+str(BACTH_SIZE)+", 2, "+str(HEIGHT)+", "+str(WIDTH)+"]")
         print("Size is "+str(batch_mask_tensor.shape))
-
+        
