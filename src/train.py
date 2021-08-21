@@ -3,15 +3,18 @@ from preprocess import tensorize_image, tensorize_mask, image_mask_check
 import os
 import glob
 import numpy as np
+import torch
 import torch.nn as nn
 import torch.optim as optim
+import tqdm
+import cv2
 
 ######### PARAMETERS ##########
-valid_size = 0.3
-test_size  = 0.1
+valid_size = 0.15
+test_size  = 0.15
 batch_size = 4
-epochs = 20
-cuda = False
+epochs = 30
+cuda = True
 input_shape = (224, 224)
 n_classes = 2
 ###############################
@@ -73,8 +76,8 @@ if cuda:
 for epoch in range(epochs):
     running_loss = 0
     for ind in range(steps_per_epoch):
-        batch_input_path_list = test_input_path_list[batch_size*ind:batch_size*(ind+1)]
-        batch_label_path_list = test_label_path_list[batch_size*ind:batch_size*(ind+1)]
+        batch_input_path_list = train_input_path_list[batch_size*ind:batch_size*(ind+1)]
+        batch_label_path_list = train_label_path_list[batch_size*ind:batch_size*(ind+1)]
         batch_input = tensorize_image(batch_input_path_list, input_shape, cuda)
         batch_label = tensorize_mask(batch_label_path_list, input_shape, n_classes, cuda)
 
@@ -99,3 +102,7 @@ for epoch in range(epochs):
                 break
 
             print('validation loss on epoch {}: {}'.format(epoch, val_loss))
+
+torch.save(model, 'Model.pth')
+print("Model Saved!")
+model_t = torch.load('Model.pth')
