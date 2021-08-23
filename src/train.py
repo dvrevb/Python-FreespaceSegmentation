@@ -106,3 +106,28 @@ for epoch in range(epochs):
 torch.save(model, 'Model.pth')
 print("Model Saved!")
 model_t = torch.load('Model.pth')
+
+
+def predict(test_input_path_list):
+
+    for i in tqdm.tqdm(range(len(test_input_path_list))):
+        batch_test = test_input_path_list[i:i+1]
+        test_input = tensorize_image(batch_test, input_shape, cuda)
+        outs = model(test_input)
+        out=torch.argmax(outs,axis=1)
+        out_cpu = out.cpu()
+        outputs_list=out_cpu.detach().numpy()
+        mask=np.squeeze(outputs_list,axis=0)
+            
+            
+        img=cv2.imread(batch_test[0])
+        mg=cv2.resize(img,(224,224))
+        mask_ind   = mask == 1
+        cpy_img  = mg.copy()
+        mg[mask==0 ,:] = (255, 0, 125)
+        opac_image=(mg/2+cpy_img/2).astype(np.uint8)
+        predict_name=batch_test[0]
+        predict_path=predict_name.replace('images', 'predict')
+        cv2.imwrite(predict_path,opac_image.astype(np.uint8))
+
+predict(test_input_path_list)
