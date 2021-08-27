@@ -1,4 +1,5 @@
 from model import FoInternNet
+from utils import draw_graph
 from preprocess import tensorize_image, tensorize_mask, image_mask_check
 import os
 import glob
@@ -71,6 +72,8 @@ optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 if cuda:
     model = model.cuda()
 
+train_losses=[]
+val_losses=[]
 
 # TRAINING THE NEURAL NETWORK
 for epoch in range(epochs):
@@ -91,6 +94,7 @@ for epoch in range(epochs):
         running_loss += loss.item()
         print(ind)
         if ind == steps_per_epoch-1:
+            train_losses.append(running_loss)
             print('training loss on epoch {}: {}'.format(epoch, running_loss))
             val_loss = 0
             for (valid_input_path, valid_label_path) in zip(valid_input_path_list, valid_label_path_list):
@@ -98,7 +102,8 @@ for epoch in range(epochs):
                 batch_label = tensorize_mask([valid_label_path], input_shape, n_classes, cuda)
                 outputs = model(batch_input)
                 loss = criterion(outputs, batch_label)
-                val_loss += loss
+                val_loss += loss.item()
+                val_losses.append(val_loss)
                 break
 
             print('validation loss on epoch {}: {}'.format(epoch, val_loss))
@@ -107,6 +112,7 @@ torch.save(model, 'Model.pth')
 print("Model Saved!")
 model_t = torch.load('Model.pth')
 
+draw_graph(val_losses,train_losses,epochs)
 
 def predict(test_input_path_list):
 
