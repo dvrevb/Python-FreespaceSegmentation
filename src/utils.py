@@ -1,3 +1,6 @@
+#author: Burak Cevik
+
+import matplotlib.pyplot as plt
 def draw_graph(val_losses,train_losses,epochs):
     norm_validation = [float(i)/sum(val_losses) for i in val_losses]
     norm_train = [float(i)/sum(train_losses) for i in train_losses]

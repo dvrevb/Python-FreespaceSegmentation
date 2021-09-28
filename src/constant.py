@@ -1,3 +1,5 @@
+#author: Burak Cevik
+
 import os
 
 # Path to jsons

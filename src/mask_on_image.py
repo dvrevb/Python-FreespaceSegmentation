@@ -1,11 +1,11 @@
-#import libraries
+#author: Burak Cevik
+
 import os
 import cv2
 import tqdm
 import numpy as np
 import matplotlib.pyplot as plt
 from constant import * #constant values
-
 
 # Create a list which contains every file name in masks folder
 mask_list = os.listdir(MASK_DIR)

@@ -1,4 +1,5 @@
-#import libraries
+#author: Burak Cevik
+
 import json
 import os
 import numpy as np

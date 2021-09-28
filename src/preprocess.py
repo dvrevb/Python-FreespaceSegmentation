@@ -1,19 +1,16 @@
+#author: Burak Cevik
+
 """
 We need to prepare the data to feed the network: we have - data/masks, data/images - directories where we prepared masks and input images. Then, convert each file/image into a tensor for our purpose.
-
 We need to write two functions in src/preprocess.py:
     - one for feature/input          -> tensorize_image()
     - the other for mask/label    -> tensorize_mask()
-
-
 Our model will accepts the input/feature tensor whose dimension is
 [batch_size, output_shape[0], output_shape[1], 3]
 &
 the label tensor whose dimension is
 [batch_size, output_shape[0], output_shape[1], 2].
-
 At the end of the task, our data will be ready to train the model designed.
-
 """
 
 
@@ -115,20 +112,6 @@ def tensorize_mask(mask_path_list, output_shape, n_class, cuda=False):
 
     return torch_mask
 
-def decode_and_convert_image(data, n_class):
-    decoded_data_list = []
-    decoded_data = np.zeros((data.shape[2], data.shape[3]), dtype=np.int)
-
-    for tensor in data:
-        for i in range(len(tensor[0])):
-            for j in range(len(tensor[1])):
-                if (tensor[1][i,j] == 0):
-                    decoded_data[i, j] = 255
-                else: #(tensor[1][i,j] == 1):
-                    decoded_data[i, j] = 0
-        decoded_data_list.append(decoded_data)
-    
-    return decoded_data_list
 def image_mask_check(image_path_list, mask_path_list):
     """
     Since it is supervised learning, there must be an expected output for each
@@ -163,6 +146,7 @@ def image_mask_check(image_path_list, mask_path_list):
 
     return True
 
+############################ TODO ################################
 def torchlike_data(data):
     """
     Change data structure according to Torch Tensor structure where the first
@@ -173,7 +157,7 @@ def torchlike_data(data):
         Shape : HxWxC.
     Returns
     -------
-    torchlike_data : Array of float64
+    torchlike_data_output : Array of float64
         Shape : CxHxW.
     """
 
@@ -187,6 +171,7 @@ def torchlike_data(data):
     for ch in range(n_channels):
         torchlike_data[ch] = data[:,:,ch]
     return torchlike_data
+    return torchlike_data_output
 
 def one_hot_encoder(data, n_class):
     """
@@ -204,7 +189,7 @@ def one_hot_encoder(data, n_class):
         Each channel labels for a class.
     """
     if len(data.shape) != 2:
-        print("It should be same with the layer dimension")
+        print("It should be same with the layer dimension, in this case it is 2")
         return
     if len(np.unique(data)) != n_class:
         print("The number of unique values ​​in 'data' must be equal to the n_class")
@@ -219,14 +204,15 @@ def one_hot_encoder(data, n_class):
     #
     for lbl in range(n_class):
 
-        encoded_label = encoded_labels[lbl] # lbl = 0 için (arkaplan) [1, 0] labeli olusturuluyor, 
-                                            # lbl = 1 için (freespace) [0, 1] labelini olusturuluyor.
+        encoded_label = encoded_labels[lbl] # lbl = 0 için (arkaplan) [1, 0] labelini oluşturuyorum, 
+                                # lbl = 1 için (freespace) [0, 1] labelini oluşturuyorum.
         numerical_class_inds = data[:,:] == lbl # lbl = 0 için data'nın 0'a eşit olduğu w,h ikililerini alıyorum diyelim ki (F).
                                                 # lbl = 1 için data'nın 1'e eşit olduğu w,h ikililerini alıyorum diyelim ki (O).
         encoded_data[numerical_class_inds] = encoded_label # lbl = 0 için tüm F'in sahip olduğu tüm w,h ikililerini [1, 0]'a eşitliyorum.
                                                             # lbl = 1 için tüm O'un sahip olduğu tüm w,h ikililerini [0, 1]'e eşitliyorum.
 
     return encoded_data
+############################ TODO END ################################
 
 if __name__ == '__main__':
 
